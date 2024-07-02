@@ -1,0 +1,16 @@
+
+.DS_Store
+.gitignore
+.idea/$PROJECT_FILE$
+.idea/.gitignore
+.idea/codeStyles/
+.idea/compiler.xml
+.idea/inspectionProfiles/
+.idea/markdown-navigator-enh.xml
+.idea/markdown-navigator.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/qaplug_profiles.xml
+.idea/sbt.xml
+.idea/vcs.xml
+
