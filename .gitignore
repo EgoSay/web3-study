@@ -14,3 +14,4 @@
 .idea/sbt.xml
 .idea/vcs.xml
 
+/target/
