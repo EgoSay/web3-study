@@ -15,7 +15,7 @@ public class GenerateHash {
         System.out.println("满足条件的哈希值: " + generateHashWithLeadingZeros(initialValue, 5));
     }
 
-    private static String generateHashWithLeadingZeros(String initialValue, int leadingZeroCount) {
+    public static String generateHashWithLeadingZeros(String initialValue, int leadingZeroCount) {
         Random random = new Random();
         String hash = "";
         String targetPrefix = new String(new char[leadingZeroCount]).replace('\0', '0');
