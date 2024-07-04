@@ -28,7 +28,7 @@ contract Bank is OwnerAdmin{
     event Banlances(address  user, uint256 amount);
 
     // Event to log withdrawals
-    event Withdraw(address user, uint256 amount);
+    event Withdraw(address user, uint256 bankBalance, uint256 adminBanlance);
 
     // receive ether and update top3 depositors
     receive() external payable {
@@ -44,12 +44,12 @@ contract Bank is OwnerAdmin{
 
     // withdraw amount, only contract owner can do it
     function withdraw(uint256 amount) external onlyOwner {
-        uint256 contractBalance = address(this).balance;
-        require (contractBalance >= amount, "Bank balance must be greater than withdram amount");
+        uint256 bankBalance = address(this).balance;
+        require (bankBalance >= amount, "Bank balance must be greater than withdram amount");
         // transfer address balance to admin 
         payable(getOwnerAdmin()).transfer(amount);
         
-        emit Withdraw(getOwnerAdmin(), contractBalance);
+        emit Withdraw(getOwnerAdmin(), bankBalance, getOwnerAdmin().balance);
     }
 
     function _updateTopDepositors(address user) internal {
