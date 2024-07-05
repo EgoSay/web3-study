@@ -7,7 +7,7 @@ contract BigBank is Bank {
     event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);
 
     modifier checkEither {
-        require (msg.value > 0.001 ether, "Deposit amount must be greater than 0");
+        require (msg.value > 0.001 ether, "Deposit amount must be greater than 0.001 ether");
         _;
     }
 

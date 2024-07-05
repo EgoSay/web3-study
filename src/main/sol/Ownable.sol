@@ -14,7 +14,7 @@ contract Ownable {
         _admin = msg.sender;
     }
     modifier onlyOwner {
-        require(msg.sender == _admin, "Only admin can call this function.");
+        require(msg.sender == _admin, "Only admin can do this operation");
         _;
     }
 
