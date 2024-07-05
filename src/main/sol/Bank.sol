@@ -1,23 +1,15 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity ^0.8.0;
 
-contract OwnerAdmin {
-    address private _owner;
-    constructor() {
-        _owner = msg.sender;
-    }
-    modifier onlyOwner {
-        require(msg.sender == _owner, "Only owner can call this function.");
-        _;
-    }
-
-    function getOwnerAdmin() public view returns (address) {
-        return _owner;
-    }
+interface IBank {
+    function deposit() external payable;
+    function withdraw(uint256 amount) external;
 
 }
 
-contract Bank is OwnerAdmin{
+contract Bank is IBank {
+    // define admin
+    address internal _admin; 
     // Mapping to track the balance of each depositor
     mapping (address => uint) balances;
     // Array to store the addresses of the top 3 depositors
@@ -30,9 +22,28 @@ contract Bank is OwnerAdmin{
     // Event to log withdrawals
     event Withdraw(address user, uint256 bankBalance, uint256 adminBanlance);
 
-    // receive ether and update top3 depositors
+    constructor() {
+        _admin = msg.sender;
+    }
+    modifier onlyOwner {
+        require(msg.sender == _admin, "Only admin can call this function.");
+        _;
+    }
+    function getOwnerAdmin() public view returns (address) {
+        return _admin;
+    }
+
+    
     receive() external payable {
-        require (msg.value > 0, "Deposit amount must be greater than 0");
+        deposit();
+    }
+    fallback() external payable {
+        deposit();
+    }
+
+    // receive ether and update top3 depositors
+    function deposit() public virtual payable {
+        require (msg.value > 1, "Deposit amount must be greater than 0");
         balances[msg.sender] += msg.value;
 
         // refresh top3 depositors
@@ -86,11 +97,18 @@ contract Bank is OwnerAdmin{
         }
     }
 
+    // get getTopDepositors
     function getTopDepositors() external view returns (address[3] memory) {
         return topDepositors;
     }
 
-    function getBalance(address user) external view returns (uint256) {
+    // get user balance
+    function getUserBalance(address user) external view returns (uint256) {
         return balances[user];
+    }
+
+    // get bank banlance
+    function getBankBalance() external view returns (uint256) {
+        return address(this).balance;
     }
 }
