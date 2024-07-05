@@ -1,13 +1,7 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity ^0.8.0;
 
-interface IBank {
-    function deposit() external payable;
-    function withdraw(uint256 amount) external;
-
-}
-
-contract Bank is IBank {
+contract Bank  {
     // define admin
     address internal _admin; 
     // Mapping to track the balance of each depositor
@@ -26,7 +20,7 @@ contract Bank is IBank {
         _admin = msg.sender;
     }
     modifier onlyOwner {
-        require(msg.sender == _admin, "Only admin can call this function.");
+        require(msg.sender == _admin, "Only admin can do this operation");
         _;
     }
     function getOwnerAdmin() public view returns (address) {

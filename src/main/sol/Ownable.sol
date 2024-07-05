@@ -1,10 +1,24 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
 pragma solidity ^0.8.0;
-import "./Bank.sol";
+
+interface IBank {
+    function deposit() external payable;
+    function withdraw(uint256 amount) external;
+}
 
 contract Ownable {
 
-    function withdraw(address bankAddr, uint256 amount) external {
+    address private _admin;
+
+    constructor() {
+        _admin = msg.sender;
+    }
+    modifier onlyOwner {
+        require(msg.sender == _admin, "Only admin can call this function.");
+        _;
+    }
+
+    function withdraw(address bankAddr, uint256 amount) external onlyOwner {
         IBank(bankAddr).withdraw(amount);
     }
 
