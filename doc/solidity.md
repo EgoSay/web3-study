@@ -37,5 +37,19 @@ emit Deposit(msg.sender, value);
 ### 使用场景
 - 链上存储成本很高，一些变量定义如果不是被经常调用或者必须使用，就可以考虑使用事件来存储，能降低很多 Gas 成本
 - 用事件记录完整的交易历史
---- 
-## ABI
+
+
+## ABI 与底层调用
+类似于 Java 中的 RPC 接口定义，其他合约可以根据 ABI 找到对应的函数方法，调用其他合约
+
+### 底层调用
+使用地址的底层调用功能，是在运行时动态地决定调用目标合约和函数， 因此在编译时，可以不知道具体要调用的函数或方法，类似于 Java 中的反射
+有 3 个底层的成员函数
+- `targetAddr.call(bytes memory abiEncodeData) returns (bool, bytes memory)`
+- `targetAddr.delegatecall(bytes memory abiEncodeData) returns (bool, bytes memory)`
+- `targetAddr.staticcall(bytes memory abiEncodeData) returns (bool, bytes memory)`
+
+call 是常规调用，delegatecall 为委托调用，staticcall 是静态调用（不修改合约状态， 相当于调用 view 方法）
+
+### call 与 delegatecall
+https://decert.me/tutorial/solidity/solidity-adv/addr_call
