@@ -27,9 +27,9 @@ contract TokenBank {
     }
     function deposit(uint256 amount) public virtual checkAmount(amount) {
         require (amount <= token.balanceOf(msg.sender), "Insufficient balance");
-        balances[msg.sender] += amount;
         // require 保证转账安全性
         require(token.transferFrom(msg.sender, address(this), amount), "TOKEN_TRANSFER_OUT_FAILED");
+        balances[msg.sender] += amount;
         emit Deposit(msg.sender, amount);
         emit Banlances(msg.sender, balances[msg.sender]);
     }
@@ -42,5 +42,10 @@ contract TokenBank {
         require(token.transfer(msg.sender, amount), "withdraw failed");
         balances[msg.sender] -= amount;
         emit Withdraw(msg.sender, balances[msg.sender], amount);
+    }
+
+    // get user balance
+    function getUserBalance(address user) external view returns (uint256) {
+        return balances[user];
     }
 }
