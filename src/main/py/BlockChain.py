@@ -37,8 +37,10 @@ class Blockchain(object):
             'proof': proof,
             'previous_hash': previous_hash or self.hash(self.chain[-1])
         } 
+        print(f'{block}')
         self.current_transactions = []
         self.chain.append(block)
+        print(f'{self.chain}')
         return block      
     
     def new_transaction(self, sender, recipient, amount):
@@ -240,7 +242,7 @@ def consensus():
 
 if __name__ == '__main__':
     parser = ArgumentParser()
-    parser.add_argument('-p', '--port', default=5000, type=int, help='port to listen on')
+    parser.add_argument('-p', '--port', default=7001, type=int, help='port to listen on')
     args = parser.parse_args()
     port = args.port
     app.run(host='0.0.0.0', port=port)
