@@ -1,13 +1,67 @@
+## 基础概念
+### 可见性
+|     | public   | external   | internal   | private   |
+| --- | --- | --- | --- | --- |
+| 修饰函数   |   Yes  |  Yes   |  Yes   |  Yes   |
+| 修饰变量   |   Yes  |   No  |    Yes |   Yes  |
+| 当前合约内可访问    |   Yes  |  No   |  Yes   |  Yes   |
+| 派生合约可访问    |   Yes  |  No  |   Yes  |  No   |
+| 外部访问    |  Yes   |   Yes  |   No  |  No   |
 
-## 接收以太坊
-receive 和 payable 只适用于接收以太坊
+### 变量
+- `constant` 定义常量, 常量不占用合约的存储空间，定义的时候必须赋值
+- `immutable` 定义不可修改变量, 在构造函数中进行赋值，构造函数是在部署的时候执行，因此这是运行时赋值
 
-## 继承、接口
+### 函数
+函数定义: `function + 函数名(参数列表) + 可⻅性 + 状态可变性（可多个）+ 返回值
+`
+
+#### 状态可变性: 
+- `view`：用 view 修饰的函数，称为视图函数，它只能读取状态，而不能修改状态。
+- `pure`：用 pure 修饰的函数，称为纯函数，它既不能读取也不能修改状态。
+- `payable`：用 payable 修饰的函数表示可以接受以太币，如果未指定，该函数将自动拒绝所有发送给它的以太币
+
+#### 回调函数
+- `receive`: 有转账了，通知告诉合约一下
+- `fallback`: 找不到对应的方法时被调用，最后的保障
+
+### 接收以太坊
+receive 和 payable 只适用于接收以太坊 ？
+
+### 继承、接口
 - `is` ： 继承某合约
 - `abstract`： 表示该合约不可被部署
 - `super`：调用父合约函数
 - `virtual`： 表示函数可以被重写
 - `override`： 表示重写了父合约函数
+
+### 函数修饰器
+用于在函数执行前检查某种前置条件, 支持传递参数，支持多个修改器一起使用
+修改器也是可被继承的，同时还可被继承合约重写（Override）
+
+```
+modifier checkAmount(uint256 amount) {
+        require (amount > 0, "amount must be greater than 0");
+        _;
+    }
+```
+函数修改器一般是带有一个特殊符号 `_;`  修改器所修饰的函数的函数体会被插入到`_;`的位置, 注意调用顺序
+
+### 错误处理
+TODO
+
+### 区分合约及外部地址
+合约地址和外部地址在 EVM 层本质是一样的，都是有：`nonce（交易序号）`、
+`balance（余额）`、`storageRoot（状态）`、`codeHash（代码）`, 区别在于外部 EOA 账户并没有 `storageRoot（状态）`、`codeHash（代码）` 
+
+EVM提供了一个操作码EXTCODESIZE，用来获取地址相关联的代码大小（长度），如果是外部账号地址，则没有代码返回， 因此我们可以使用以下方法判断合约地址及外部账号地址:
+```solidity
+function isContract(address addr) internal view returns (bool) {
+  uint256 size;
+  assembly { size := extcodesize(addr) }
+    return size > 0;
+}
+```
 
 ## 事件日志
 ### 定义
