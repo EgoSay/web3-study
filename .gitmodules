@@ -1,0 +1,3 @@
+[submodule "blockchain-in-js"]
+	path = blockchain-in-js
+	url = git@github.com:EgoSay/blockchain-in-js.git
