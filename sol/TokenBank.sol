@@ -40,6 +40,7 @@ contract TokenBank {
         require (balances[msg.sender] >= amount, "Bank balance must be greater than withdraw amount");
         // require 保证转账安全性
         require(token.transfer(msg.sender, amount), "withdraw failed");
+        balances[msg.sender] -= amount;
         emit Withdraw(msg.sender, balances[msg.sender], amount);
     }
 }
