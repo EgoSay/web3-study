@@ -46,7 +46,7 @@ contract NFTMarket {
     }
 
     // buy nft from the market
-    function buyNFT(address nftContract, uint256 tokenId) external returns (bool) {
+    function buyNFT(address nftContract, uint256 tokenId) public returns (bool) {
         nftTokens memory nftInfo = nftSaleMap[nftContract][tokenId];
         uint256 balance = paymentTokenAddr.balanceOf(msg.sender);
         require(balance > nftInfo.price, "have no enough balance");
@@ -58,6 +58,44 @@ contract NFTMarket {
         delete nftSaleMap[nftContract][tokenId];
         emit NFTBought(msg.sender, nftContract, tokenId);
         return true;
+    }
+
+    function getNFTPrice(address nftContract, uint256 tokenId) public view returns (uint256) {
+        nftTokens memory nftInfo = nftSaleMap[nftContract][tokenId];
+        return nftInfo.price;
+    }
+
+    function onNFTReceived(address buyer, uint256 amount, bytes calldata data) external returns (bool) {
+        // decode calldata and get nftContract address and tokenId
+        address nftContract;
+        uint256 tokenId;
+        (nftContract, tokenId) = decodeNFTInfo(data);
+        uint256 price = getNFTPrice(nftContract, tokenId);
+        require(amount >= price, "have no enough token");
+
+        nftTokens memory nftInfo = nftSaleMap[nftContract][tokenId];
+        paymentTokenAddr.transfer(nftInfo.seller, amount);
+        // erc721 transfer nft to the buyer
+        IERC721(nftContract).transferFrom(address(this), buyer, tokenId);
+        // delist nft from the market
+        delete nftSaleMap[nftContract][tokenId];
+        emit NFTBought(buyer, nftContract, tokenId);
+    }
+
+    // check if EOA
+    function isContract(address user) internal view returns (bool) {
+        uint256 size;
+        assembly {
+            size := extcodesize(user)
+        }
+        // eoa account have no codeHash
+        return size > 0;
+    }
+
+    function decodeNFTInfo(bytes calldata data) public pure returns (address, uint256) {
+        // 使用 abi.decode 从 data 中解析出 address 和 uint256
+        (address addr, uint256 value) = abi.decode(data, (address, uint256));
+        return (addr, value);
     }
 
 }
