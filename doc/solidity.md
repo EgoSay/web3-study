@@ -25,8 +25,8 @@
 - `receive`: 有转账了，通知告诉合约一下
 - `fallback`: 找不到对应的方法时被调用，最后的保障
 
-### 接收以太坊
-receive 和 payable 只适用于接收以太坊 ？
+receive 和 payable 只适用于接收以太坊
+
 
 ### 继承、接口
 - `is` ： 继承某合约
