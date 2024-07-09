@@ -1,0 +1,12 @@
+{
+    "title": "CJW-FIRST-NFT",
+    "description": "CJW-FIRST-NFT",
+    "image": "ipfs://QmQLLwDke9NpYbaUwihx4A3b5hPbMKJvQEuUwxkYGWSZw7",
+    "attributes": [
+        {
+            "trait_type": "id",
+            "value": "test001"
+        }
+    ],
+    "version": "1"
+}
