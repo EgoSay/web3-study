@@ -21,7 +21,7 @@ contract BankTest is Test {
         vm.prank(DEFAULT_ADDRESS);
 
         uint amount = 8 ether;
-        vm.expectEmit(true, true, false, true);
+        vm.expectEmit(true, true, false, false);
         emit Deposit(DEFAULT_ADDRESS, amount);
         
         bank.depositETH{value: amount}();
