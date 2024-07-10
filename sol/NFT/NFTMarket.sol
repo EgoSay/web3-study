@@ -65,21 +65,20 @@ contract NFTMarket {
         return nftInfo.price;
     }
 
-    function onNFTReceived(address buyer, uint256 amount, bytes calldata data) external returns (bool) {
+    function onTransferReceived(address buyer, uint256 amount, bytes calldata data) external returns (bool) {
         // decode calldata and get nftContract address and tokenId
         address nftContract;
         uint256 tokenId;
         (nftContract, tokenId) = decodeNFTInfo(data);
         uint256 price = getNFTPrice(nftContract, tokenId);
         require(amount >= price, "have no enough token");
-
-        nftTokens memory nftInfo = nftSaleMap[nftContract][tokenId];
-        paymentTokenAddr.transfer(nftInfo.seller, amount);
+        paymentTokenAddr.transfer(nftSaleMap[nftContract][tokenId].seller, amount);
         // erc721 transfer nft to the buyer
         IERC721(nftContract).transferFrom(address(this), buyer, tokenId);
         // delist nft from the market
         delete nftSaleMap[nftContract][tokenId];
         emit NFTBought(buyer, nftContract, tokenId);
+        return true;
     }
 
     // check if EOA

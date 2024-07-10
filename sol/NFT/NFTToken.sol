@@ -4,7 +4,7 @@ pragma solidity ^0.8.0;
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
 
 interface INFTMarket {
-    function onNFTReceived(address from, uint256 amount, bytes calldata data) external returns (bool);
+    function onTransferReceived(address from, uint256 amount, bytes calldata data) external returns (bool);
 }
 
 contract MyERC20 is ERC20 {
@@ -27,7 +27,7 @@ contract MyERC20 is ERC20 {
         // if the address is a nft contract, try to notify it to receive
          _transfer(msg.sender, recipient, amount);
         if (isContract(recipient)) {
-            require (INFTMarket(recipient).onNFTReceived(msg.sender, amount, data));
+            require (INFTMarket(recipient).onTransferReceived(msg.sender, amount, data));
         } 
         emit Trade(msg.sender, recipient, amount);
         return true;
