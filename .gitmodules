@@ -1,3 +1,6 @@
 [submodule "blockchain-in-js"]
 	path = blockchain-in-js
 	url = git@github.com:EgoSay/blockchain-in-js.git
+[submodule "basis/lib/forge-std"]
+	path = basis/lib/forge-std
+	url = https://github.com/foundry-rs/forge-std
