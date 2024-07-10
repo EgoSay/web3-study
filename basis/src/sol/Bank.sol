@@ -106,4 +106,11 @@ contract Bank  {
     function getBankBalance() external view returns (uint256) {
         return address(this).balance;
     }
+
+    function depositETH() external payable {
+        require(msg.value > 0, "Deposit amount must be greater than 0");
+        balances[msg.sender] += msg.value;
+        emit Deposit(msg.sender, msg.value);
+    }
+
 }
