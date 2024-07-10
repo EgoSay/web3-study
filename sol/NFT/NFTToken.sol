@@ -7,7 +7,7 @@ interface INFTMarket {
     function onTransferReceived(address from, uint256 amount, bytes calldata data) external returns (bool);
 }
 
-contract MyERC20 is ERC20 {
+contract NFTToken is ERC20 {
 
     event Trade(address indexed from, address indexed to, uint256 amout);
 

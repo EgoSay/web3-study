@@ -73,8 +73,10 @@ contract NFTMarket {
         uint256 price = getNFTPrice(nftContract, tokenId);
         require(amount >= price, "have no enough token");
         paymentTokenAddr.transfer(nftSaleMap[nftContract][tokenId].seller, amount);
+
         // erc721 transfer nft to the buyer
         IERC721(nftContract).transferFrom(address(this), buyer, tokenId);
+        
         // delist nft from the market
         delete nftSaleMap[nftContract][tokenId];
         emit NFTBought(buyer, nftContract, tokenId);
