@@ -21,14 +21,13 @@ contract BankTest is Test {
         vm.prank(DEFAULT_ADDRESS);
 
         uint amount = 8 ether;
-        vm.expectEmit(true, false, false, true);
+        vm.expectEmit(true, false, false, false);
         emit Deposit(DEFAULT_ADDRESS, amount);
         
         bank.depositETH{value: amount}();
         uint256 banlance = bank.getUserBalance(DEFAULT_ADDRESS);
         console.log(DEFAULT_ADDRESS, banlance);
         assertEq(amount, banlance);
-        
     }
 
     // test failed depositETH
