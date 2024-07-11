@@ -5,6 +5,8 @@ pragma solidity ^0.8.20;
 import {NFTMarket} from "../src/sol/NFT/NFTMarket.sol";
 import {console, StdCheats, Test} from "forge-std/Test.sol";
 import {IERC721} from "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import {IERC721Errors} from "@openzeppelin/contracts/interfaces/draft-IERC6093.sol";
+
 import {IERC20, NFTToken} from "../src/sol/NFT/NFTToken.sol";
 import {MyNFT} from "../src/sol/NFT/MyNFT.sol";
 
@@ -73,13 +75,14 @@ contract NFTMarketTest is Test {
         for (uint i = 0; i < users.length; i++) {
             // 获取用户地址
             address user = users[i];
+            vm.startPrank(user);
             // 获取用户持有的NFT
             uint256 tokenId = nftOwnerMap[user];
             // 授权 NFTMarket 合约可以操作该用户的NFT
             nftContract.approve(address(nftMarketplace), tokenId);
-            uint256 price = 100;
-            vm.startPrank(user);
+            assertEq(nftContract.isApprovedForAll(user, address(nftMarketplace)), true);
 
+            uint256 price = 100;
             // 上架并验证断言是否正确
             vm.expectEmit(true, true, true, false);
             // check transfer event
@@ -101,22 +104,71 @@ contract NFTMarketTest is Test {
 
     /**
      * 测试用例2：测试失败场景，包括
-     * 1. 非 NFT 拥有者操作上架
-     * 2. 上架 NFT 时价格小于等于 0
+     * 1. 上架 NFT 时价格小于等于 0
+     * 2. 非 NFT 拥有者操作上架 
      * 3. NFTMarket 合约没有 NFT 的授权
      */
 
     function testFailListNFT() public {
-    }
 
-    // 测试用例3：上架 NFT 时价格小于等于 0
-    function testListNFTWithErrorPrice() public {
-        
+        // 测试用例2：非 NFT 拥有者操作上架
+        for (uint i = 0; i < users.length; i++) {
+            // 获取用户地址
+            address user = users[i];
+            // 获取用户持有的NFT
+            uint256 tokenId = nftOwnerMap[user];
+            uint256 price = 100;
+            // 验证 非 NFT 拥有者操作上架  是否抛出异常
+            address nonOwner = makeAddr("nonOwner");
+            vm.prank(nonOwner);
+            vm.expectRevert("not nft owner");
+            nftMarketplace.list(address(nftContract), tokenId, price);
+           
+            
+            // 验证上架 NFT 时价格小于等于 0
+            price = 0;
+            vm.startPrank(user);
+            vm.expectRevert("nft price must greater than 0");
+            nftMarketplace.list(address(nftContract), tokenId, price);
+
+            // 验证 NFTMarket 合约没有 NFT 的授权
+            price = 100;
+            // vm.expectRevert(
+            //     abi.encodeWithSelector(ERC721InsufficientApproval.selector, address(nftMarketplace), tokenId)
+            // );
+            // TODO 
+            nftMarketplace.list(address(nftContract), tokenId, price);
+            vm.stopPrank();
+        }
+            
     }
 
     function testBuyNFT() public {
+        // 验证 nft owner 是否正确
+        // 上架 nft
+        // 计算 user 当前 Token 余额
+        // 随机生成一个用户 buyer, deal 部分 token, 用于购买 nft
+        // 购买 nft, 验证断言是否正确
+        // 验证 nft owner 是否转移
+        // 验证 user 和 buyer 余额 token 是否正确
+ 
+    }
+
+    function testFailBuyNFT() public {
+        // 支付Token过多或者过少情况
+        // 自己购买自己的NFT
+        // NFT被重复购买
+    }
+
+    
+    // 测试随机使用 0.01-10000 Token价格上架NFT, 并随机使用任意Address购买 NFT
+    function testFuzzNFT(address buyer, uint256 price) public {
         
     }
 
+     // 不可变测试：测试无论如何买卖，NFTMarket合约中都不可能有 Token 持仓
+    function invariant_nftmarketTokenBalance() public {
+        
+    }
     
 }
