@@ -34,6 +34,7 @@ contract NFTMarketTest is Test {
     address[] users;
     // Mappingto track nft tokenId and it's owner
     mapping(address => uint256) nftOwnerMap;
+    uint256 constant private INIT_TOKEN_PRICE = 888;
 
     function setUp() public {
         address initAddr = makeAddr("init");
@@ -50,7 +51,7 @@ contract NFTMarketTest is Test {
             // generate a user and nft uri
             address testUser = address(uint160(uint256(keccak256(abi.encodePacked(i)))));
             deal(testUser, 1e9 ether);
-            deal(address(nftToken), testUser, 1e9);
+            deal(address(nftToken), testUser, INIT_TOKEN_PRICE);
             string memory tokenURI = generateRandomURI();
             // mint nft to user
             nftContract.mint(testUser, tokenURI);
@@ -144,18 +145,55 @@ contract NFTMarketTest is Test {
     }
 
     function testBuyNFT() public {
-        // 验证 nft owner 是否正确
-        // 上架 nft
-        // 计算 user 当前 Token 余额
-        // 随机生成一个用户 buyer, deal 部分 token, 用于购买 nft
-        // 购买 nft, 验证断言是否正确
-        // 验证 nft owner 是否转移
-        // 验证 user 和 buyer 余额 token 是否正确
- 
+            (address seller, uint256 price) = prepareBeforeBuyNFT();
+            uint256 init_price = nftToken.balanceOf(seller);
+            uint256 tokenId = nftOwnerMap[seller];
+            // 随机生成一个用户 buyer, deal 部分 token, 用于购买 nft
+            address buyer = makeAddr("buyer");
+            vm.startPrank(buyer);
+            deal(address(nftToken), buyer, INIT_TOKEN_PRICE);
+            nftToken.approve(address(nftMarketplace), INIT_TOKEN_PRICE);
+            // 购买 nft, 验证断言是否正确
+            bool buyResult = nftMarketplace.buyNFT(address(nftContract), tokenId);
+            assertTrue(buyResult);
+            vm.stopPrank();
+            // 验证 nft owner 是否转移
+            assertEq(buyer, nftContract.ownerOf(tokenId));
+            // 验证 user 和 buyer 余额 token 是否正确
+            assertEq(nftToken.balanceOf(buyer), (INIT_TOKEN_PRICE - price));
+            assertEq(nftToken.balanceOf(seller), (init_price + price));
+    }
+
+    // 购买 NFT 前置准备
+    function prepareBeforeBuyNFT() internal returns (address, uint256) {
+            // 获取用户地址并设置 nft owner 
+            address user = users[0];
+            vm.startPrank(user);
+            // 获取用户持有的NFT
+            uint256 tokenId = nftOwnerMap[user];
+            // 授权 NFTMarket 合约可以操作该用户的NFT
+            nftContract.approve(address(nftMarketplace), tokenId);
+            uint256 price = 100;
+            // 上架 nft
+            bool listedRsult = nftMarketplace.list(address(nftContract), tokenId, price);
+             // 验证结果
+            assertTrue(listedRsult);
+            vm.stopPrank();
+            return (user,  price);
     }
 
     function testFailBuyNFT() public {
+        (address seller, uint256 price) = prepareBeforeBuyNFT();
+        uint256 tokenId = nftOwnerMap[seller];
+        // 随机生成一个用户 buyer, deal 部分 token, 用于购买 nft
+        address buyer = makeAddr("buyer");
+        vm.startPrank(buyer);
         // 支付Token过多或者过少情况
+        deal(address(nftToken), buyer, price - 1);
+        nftToken.approve(address(nftMarketplace), price - 1);
+        vm.expectRevert(bytes("have no enough balance"));
+        nftMarketplace.buyNFT(address(nftContract), tokenId);
+        vm.stopPrank();
         // 自己购买自己的NFT
         // NFT被重复购买
     }
