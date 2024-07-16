@@ -71,7 +71,6 @@ contract TokenBank {
 
     constructor(address tokenAddr) {
         token = IERC20(tokenAddr);
-        owner = msg.sender;
     }
 
     // Event to log deposits
@@ -83,11 +82,6 @@ contract TokenBank {
 
     modifier checkAmount(uint256 amount) {
         require (amount > 0, "amount must be greater than 0");
-        _;
-    }
-
-    modifier onlyOwner {
-        require(msg.sender == owner, "Only owner can call this function.");
         _;
     }
 
@@ -117,7 +111,8 @@ contract TokenBank {
     }
 
     // the callback receives the token and records it
-    function onTransferReceived(address to, uint256 amount) external onlyOwner checkAmount(amount) returns (bool) {
+    function onTransferReceived(address to, uint256 amount) external checkAmount(amount) returns (bool) {
+        require(msg.sender == address(token), "invalid token address");
         balances[to].add(amount);
         emit Deposit(msg.sender, to, amount);
         emit Banlances(to, balances[msg.sender]);
