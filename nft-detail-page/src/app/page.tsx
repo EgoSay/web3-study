@@ -14,7 +14,7 @@ interface Detail {
 
 interface NftData {
   tokenURI: string;
-  name: string;
+  nftName: string;
   detail: Detail;
   owner: string;
 }
@@ -58,7 +58,7 @@ const Home: React.FC = () => {
       {error && <p className="error">{error}</p>}
       {nftData && (
         <div className={styles.result}>
-          <h2>{nftData.name}</h2>
+          <h2>{nftData.detail.name}</h2>
           <p><strong>Token URI:</strong> {nftData.tokenURI}</p>
           <p><strong>Owner:</strong> {nftData.owner}</p>
           <div className={styles.content}>

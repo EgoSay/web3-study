@@ -71,7 +71,7 @@ export const fetchNftDetails = async (tokenId: string) => {
     const metadata = await tokenUriResponse.json();
 
     return {
-      name: name,
+      nftName: name,
       owner: owner,
       tokenURI: tokenURI,
       detail: metadata
