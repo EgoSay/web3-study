@@ -7,3 +7,6 @@
 [submodule "basis/lib/openzeppelin-contracts"]
 	path = basis/lib/openzeppelin-contracts
 	url = https://github.com/OpenZeppelin/openzeppelin-contracts
+[submodule "wallet-connect"]
+	path = wallet-connect
+	url = git@github.com:EgoSay/wallet-connect.git
