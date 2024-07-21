@@ -4,8 +4,16 @@
  * @Description: 
  */
 import { createPublicClient, http } from 'viem'
+import { privateKeyToAccount, recoverTypedDataAddress } from "viem/accounts";
 import { mainnet } from 'viem/chains';
 import TestABI from './abi.json'
+
+const signature = await account.signTypedData({
+  domain,
+  types,
+  primaryType: "Mail",
+  m
+console.log("Signature:", signature);
 
 const client = createPublicClient({
   chain: mainnet,

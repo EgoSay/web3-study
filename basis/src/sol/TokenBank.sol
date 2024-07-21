@@ -90,7 +90,7 @@ contract TokenBank {
         require (amount <= token.balanceOf(msg.sender), "Insufficient balance");
         // require 保证转账安全性
         require(token.transferFrom(msg.sender, address(this), amount), "TOKEN_TRANSFER_OUT_FAILED");
-        balances[msg.sender].add(amount);
+        balances[msg.sender] = balances[msg.sender].add(amount);
         emit Deposit(msg.sender, address(this), amount);
         emit Banlances(msg.sender, balances[msg.sender]);
     }
@@ -101,7 +101,7 @@ contract TokenBank {
         require (balances[msg.sender] >= amount, "Bank balance must be greater than withdraw amount");
         // require 保证转账安全性
         require(token.transfer(msg.sender, amount), "withdraw failed");
-        balances[msg.sender].sub(amount);
+        balances[msg.sender] = balances[msg.sender].sub(amount);
         emit Withdraw(msg.sender, balances[msg.sender], amount);
     }
 
@@ -113,7 +113,7 @@ contract TokenBank {
     // the callback receives the token and records it
     function onTransferReceived(address to, uint256 amount) external checkAmount(amount) returns (bool) {
         require(msg.sender == address(token), "invalid token address");
-        balances[to].add(amount);
+        balances[to] = balances[to].add(amount);
         emit Deposit(msg.sender, to, amount);
         emit Banlances(to, balances[msg.sender]);
         return true;

@@ -1,0 +1,8 @@
+{
+  "sepolia": {
+    "CJWNFTMarket": {
+      "address": "0x1E90d90748Bc7845D8Ac3dc78Ae1E35b6B2C5484",
+      "startBlock": 6349316
+    }
+  }
+}

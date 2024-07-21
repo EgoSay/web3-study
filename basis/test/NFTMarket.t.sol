@@ -54,7 +54,6 @@ contract NFTMarketTest is Test {
             deal(address(nftToken), testUser, INIT_TOKEN_PRICE);
             string memory tokenURI = generateRandomURI();
             // mint nft to user
-            nftContract.mint(testUser, tokenURI);
             uint256 tokenId = nftContract.mint(testUser, tokenURI);
             users.push(testUser);
             nftOwnerMap[testUser] = tokenId;
