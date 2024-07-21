@@ -1,5 +1,5 @@
 type NFTBought @entity(immutable: true) {
-  id: BigInt!
+  id: Bytes!
   buyer: Bytes! # address
   nftContract: Bytes! # address
   tokenId: BigInt! # uint256
@@ -9,7 +9,7 @@ type NFTBought @entity(immutable: true) {
 }
 
 type NFTListed @entity(immutable: true) {
-  id: BigInt!
+  id: Bytes!
   seller: Bytes! # address
   nftContract: Bytes! # address
   tokenId: BigInt! # uint256
