@@ -1,4 +1,23 @@
 ## 基础概念
+
+### 数据类型
+- 值类型（Value Types）：bool 布尔类型、uint 整数类型、address 地址类型等
+- 引用类型（Reference Types）: 参考 [引用类型](https://solidity-cn.readthedocs.io/zh/develop/types.html#index-13)
+- 映射类型（Mapping Types）: mapping(k => v)
+
+
+### 基本语法
+- `pragma`：版本声明
+- `contract`：合约声明
+- `address`：地址类型
+- `uint`：无符号整数类型
+- `bool`：布尔类型
+- `mapping`：映射类型
+- `struct`：结构体类型
+- `event`：事件类型
+- `function`：函数类型
+- `modifier`：修饰器类型
+
 ### 可见性
 |     | public   | external   | internal   | private   |
 | --- | --- | --- | --- | --- |
@@ -14,7 +33,11 @@
 
 ### 函数
 函数定义: `function + 函数名(参数列表) + 可⻅性 + 状态可变性（可多个）+ 返回值
-`
+```solidity
+function transfer(address to, uint256 value) public payable returns (bool success) {
+        // TODO
+}
+```
 
 #### 状态可变性: 
 - `view`：用 view 修饰的函数，称为视图函数，它只能读取状态，而不能修改状态。
@@ -33,13 +56,39 @@ receive 和 payable 只适用于接收以太坊
 - `abstract`： 表示该合约不可被部署
 - `super`：调用父合约函数
 - `virtual`： 表示函数可以被重写
-- `override`： 表示重写了父合约函数
+- `override`： 表示重写了父合约函数, 函数被重写后，父合约的函数就会被遮蔽, 不过可以使用 `super` 调用父合约函数
+
+Solidity 支持多重继承, 直接在is后面接多个父合约即可，例如：
+```Solidity
+contract Sub is Base1, Base2 {
+    // 需要注意，如果多个父合约之间也有继承关系，那么 is 后面的顺序应该是越往上层级的父合约写在前面
+}
+```
+
+在多重继承下，如果有多个父合约有相同定义的函数，在函数重写时，`override` 关键字后必须指定所有的父合约名
+```Solidity
+pragma solidity >=0.8.0;
+
+contract Base1 {
+    function foo() virtual public {}
+}
+
+contract Base2 {
+    function foo() virtual public {}
+}
+
+contract Inherited is Base1, Base2 {
+    // 继承自隔两个父合约定义的foo(), 必须显式的指定override
+    function foo() public override(Base1, Base2) {}
+}
+```
+
 
 ### 函数修饰器
 用于在函数执行前检查某种前置条件, 支持传递参数，支持多个修改器一起使用
 修改器也是可被继承的，同时还可被继承合约重写（Override）
 
-```
+```Solidity
 modifier checkAmount(uint256 amount) {
         require (amount > 0, "amount must be greater than 0");
         _;
@@ -48,8 +97,11 @@ modifier checkAmount(uint256 amount) {
 函数修改器一般是带有一个特殊符号 `_;`  修改器所修饰的函数的函数体会被插入到`_;`的位置, 注意调用顺序
 
 ### 错误处理
-TODO
+> 参考: [错误处理](https://decert.me/tutorial/solidity/solidity-basic/error)
 
+在以太坊上，每个交易都是原子操作，类似于在数据库里事务（transcation）一样，要么保证状态的修改要么全部成功，要么全部失败， 如果不做任何处理， 当 EVM 执行代码发生错误时， 就会回退整个交易，因此建议使用 `requir revert asset` 来检查各种可能的错误，并给出相应的错误提示
+
+---
 ### 区分合约及外部地址
 合约地址和外部地址在 EVM 层本质是一样的，都是有：`nonce（交易序号）`、
 `balance（余额）`、`storageRoot（状态）`、`codeHash（代码）`, 区别在于外部 EOA 账户并没有 `storageRoot（状态）`、`codeHash（代码）` 
@@ -106,7 +158,4 @@ emit Deposit(msg.sender, value);
 - `targetAddr.delegatecall(bytes memory abiEncodeData) returns (bool, bytes memory)`
 - `targetAddr.staticcall(bytes memory abiEncodeData) returns (bool, bytes memory)`
 
-call 是常规调用，delegatecall 为委托调用，staticcall 是静态调用（不修改合约状态， 相当于调用 view 方法）
-
-### call 与 delegatecall
-https://decert.me/tutorial/solidity/solidity-adv/addr_call
+call 是常规调用，delegatecall 为委托调用，staticcall 是静态调用(不修改合约状态， 相当于调用 view 方法), [call 与 delegatecall](https://decert.me/tutorial/solidity/solidity-adv/addr_call)
