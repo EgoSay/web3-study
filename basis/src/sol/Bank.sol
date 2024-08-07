@@ -1,32 +1,16 @@
 // SPDX-License-Identifier: SEE LICENSE IN LICENSE
-pragma solidity ^0.8.0;
+pragma solidity ^0.8.20;
+
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 
-contract Bank  {
+contract Bank  is Ownable(msg.sender){
     // define admin
     address internal _admin; 
     // Mapping to track the balance of each depositor
     mapping (address => uint) balances;
     // Array to store the addresses of the top 3 depositors
     address[3] private topDepositors;
-
-    // Event to log deposits
-    event Deposit(address user, uint256 amount);
-    event Banlances(address  user, uint256 amount);
-
-    // Event to log withdrawals
-    event Withdraw(address user, uint256 bankBalance, uint256 adminBanlance);
-
-    constructor() {
-        _admin = msg.sender;
-    }
-    modifier onlyOwner {
-        require(msg.sender == _admin, "Only admin can do this operation");
-        _;
-    }
-    function getOwnerAdmin() public view returns (address) {
-        return _admin;
-    }
 
     
     receive() external payable {
@@ -45,7 +29,6 @@ contract Bank  {
         _updateTopDepositors(msg.sender);
 
         emit Deposit(msg.sender, msg.value);
-        emit Banlances(msg.sender, balances[msg.sender]);
     }
 
     // withdraw amount, only contract owner can do it
@@ -53,9 +36,9 @@ contract Bank  {
         uint256 bankBalance = address(this).balance;
         require (bankBalance >= amount, "Bank balance must be greater than withdram amount");
         // transfer address balance to admin 
-        payable(getOwnerAdmin()).transfer(amount);
+        payable(msg.sender).transfer(amount);
         
-        emit Withdraw(getOwnerAdmin(), bankBalance, getOwnerAdmin().balance);
+        emit Withdraw(msg.sender, bankBalance, msg.sender.balance);
     }
 
     function _updateTopDepositors(address user) internal {
@@ -102,15 +85,15 @@ contract Bank  {
         return balances[user];
     }
 
-    // get bank banlance
-    function getBankBalance() external view returns (uint256) {
-        return address(this).balance;
-    }
-
     function depositETH() external payable {
         require(msg.value > 0, "Deposit amount must be greater than 0");
         balances[msg.sender] += msg.value;
         emit Deposit(msg.sender, msg.value);
     }
+
+    // Event to log deposits
+    event Deposit(address user, uint256 amount);
+    // Event to log withdrawals
+    event Withdraw(address user, uint256 bankBalance, uint256 adminBanlance);
 
 }

@@ -1,6 +1,15 @@
 
 # 合约代理升级
 
+## 底层调用（Call /DelegateCall）
+> - **Call**：调用目标合约的函数，并在目标合约的上下文中执行，但调用者合约的存储状态不会改变
+> - **DelegateCall**：调用目标合约的函数，并在调用者合约的上下文中执行，调用者合约的存储状态会改变
+
+### 底层概念
+- EVM 不关心状态变量，而是**在存储槽上操作**，所有的变量状态变化，都是对应于存储slot 上的内容变更， 所以需要**注意 slot 冲突, 也就是当前合约和目标合约的 slot 槽位布局不能冲突**
+- **一个合约对目标智能合约进行 delegatecall 时，会在自己的环境中执行目标合约的逻辑**  (相当于把目标合约的代码复制到当前合约中执行)
+
+
 ## 合约创建
 创建合约有几种主要的实现方式：
 
@@ -152,6 +161,8 @@ contract MaliciousContract {
 
 
 ## 参考链接
+- [# Delegatecall: 详细且生动的指南](https://learnblockchain.cn/article/8827)
+
 - [Writing Upgradeable Contracts](https://docs.openzeppelin.com/upgrades-plugins/1.x/writing-upgradeable)
 
 - [Transparent vs UUPS Proxies](https://docs.openzeppelin.com/contracts/5.x/api/proxy#TransparentUpgradeableProxy)

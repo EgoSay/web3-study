@@ -1,10 +1,8 @@
-<!--
- * @Author: Joe_Chan 
- * @Date: 2024-07-21 14:27:29
- * @Description: 
--->
 
 forge create --account test1 --rpc-url sepolia BaseERC20 
+
+forge script --chain sepolia script/UUPSDeploymentScript.s.sol:UUPSDeploymentScript --rpc-url sepolia --account test1 --broadcast --verify -vvvv
+forge script --chain sepolia ERC20TokenScript --rpc-url sepolia --account test1 --broadcast --verify -vvvv
 
 cast call -r local 0x5fbdb2315678afecb367f032d93f642f64180aa3 "name() returns(string)"
 
