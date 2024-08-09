@@ -10,3 +10,6 @@
 [submodule "wallet-connect"]
 	path = wallet-connect
 	url = git@github.com:EgoSay/wallet-connect.git
+[submodule "basis/lib/foundry-chainlink-toolkit"]
+	path = basis/lib/foundry-chainlink-toolkit
+	url = https://github.com/smartcontractkit/foundry-chainlink-toolkit
