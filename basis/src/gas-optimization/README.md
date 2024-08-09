@@ -12,7 +12,7 @@
 [BankGasTest](../../test/OptimizationBank.t.sol)
 
 ### 测试结果
-![image](../../test/BankGasTest.log)
+[BankGasTest.log](../../test/BankGasTest.log)
 
 
 ## Task2
