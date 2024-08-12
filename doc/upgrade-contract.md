@@ -87,6 +87,8 @@ contract ProxyFactory {
 }
 ```
 
+### 透明代理
+
 ## 合约升级
 
 ### 变量问题
@@ -156,8 +158,61 @@ contract MaliciousContract {
 
 **因此，需要禁止在逻辑合约中使用 `selfdestruct` 或 `delegatecall`**,  以太坊社区正在讨论完全移除 `selfdestruct` 的可能性
 
-
 ## 透明代理和 UUPS 代理
+
+```solidity
+// SPDX-License-Identifier: MIT
+// wtf.academy
+pragma solidity ^0.8.21;
+
+// 简单的可升级合约，管理员可以通过升级函数更改逻辑合约地址，从而改变合约的逻辑。
+// 教学演示用，不要用在生产环境
+contract SimpleUpgrade {
+    address public implementation; // 逻辑合约地址
+    address public admin; // admin地址
+    string public words; // 字符串，可以通过逻辑合约的函数改变
+
+    // 构造函数，初始化admin和逻辑合约地址
+    constructor(address _implementation) {
+        admin = msg.sender;
+        implementation = _implementation;
+    }
+
+    // fallback函数，将调用委托给逻辑合约
+    fallback() external payable {
+        (bool success, bytes memory data) = implementation.delegatecall(msg.data);
+    }
+
+    // 升级函数，改变逻辑合约地址，只能由admin调用
+    function upgrade(address newImplementation) external {
+        require(msg.sender == admin);
+        implementation = newImplementation;
+    }
+}
+```
+以上是一个最简单可升级的代理合约，它通过 `delegatecall` 将所有调用委托给逻辑合约，同时定义了一个`upgrade()` 函数，从而实现了合约的代理升级, 但是这里存在一个问题，通过 `delegatecall` 调用传参都是函数选择器（selector），它是函数签名的哈希的前4个字节，因此需要一种机制来避免这种冲突，这就引出了透明代理和 UUPS 代理
+
+### 透明代理
+透明代理的逻辑非常简单：管理员可能会因为“函数选择器冲突”，在调用逻辑合约的函数时，误调用代理合约的可升级函数。那么限制管理员的权限，不让他调用任何逻辑合约的函数，就能解决冲突：
+- 管理员变为工具人，仅能调用代理合约的可升级函数对合约升级，不能通过回调函数调用逻辑合约。
+- 其它用户不能调用可升级函数，但是可以调用逻辑合约的函数
+
+可以参考 openzeppelin 中的实现 [TransparentUpgradeableProxy](https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/proxy/transparent/TransparentUpgradeableProxy.sol)
+
+### UUPS 代理
+透明代理的逻辑简单，但也存在一个问题，每次用户调用函数时，都会多一步是否为管理员的检查，消耗更多 gas， 这就引出了另一种方案 `UUPS 代理`
+UUPS（universal upgradeable proxy standard，通用可升级代理）将升级函数放在逻辑合约中，这样一来，如果有其它函数与升级函数存在“选择器冲突”，编译时就会报错
+
+参考链接: [UUPS](https://www.wtf.academy/docs/solidity-103/UUPS/)
+
+### 总结
+普通可升级合约，透明代理，和UUPS的不同点：
+
+| 标准       | 升级函数在       | 是否会“选择器冲突” | 缺点         |
+| ---------- | ---------------- | ------------------ | ------------ |
+| 可升级代理 | Proxy合约         | 会                 | 选择器冲突   |
+| 透明代理   | Proxy合约         | 不会               | 费gas        |
+| UUPS       | Logic合约         | 不会               | 更复杂       |
 
 
 ## 参考链接
