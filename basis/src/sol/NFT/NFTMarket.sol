@@ -50,12 +50,12 @@ contract NFTMarket {
         nftTokens memory nftInfo = nftSaleMap[nftContract][tokenId];
         uint256 balance = paymentTokenAddr.balanceOf(msg.sender);
         require(balance >= nftInfo.price, " have no enough balance");
+         // delist nft from the market
+        delete nftSaleMap[nftContract][tokenId];
         // transfer erc20 token to the seller
         paymentTokenAddr.transferFrom(msg.sender, nftInfo.seller, nftInfo.price);
         // erc721 transfer nft to the buyer
         IERC721(nftContract).transferFrom(address(this), msg.sender, tokenId);
-        // delist nft from the market
-        delete nftSaleMap[nftContract][tokenId];
         emit NFTBought(msg.sender, nftContract, tokenId);
         return true;
     }
